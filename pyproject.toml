@@ -1,0 +1,38 @@
+[project]
+name = "frappe_pawapay"
+authors = [
+    { name = "Selfmade Cloud Solutions", email = "dev@selfmadecs.com" }
+]
+description = "PawaPay Payments gateway for Frappe and ERPNext."
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # Frappe, ERPNext, and payments are installed and managed by bench.
+    "http-message-signatures>=1.0,<2.0",
+    "http-sfv>=0.9,<1.0",
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "frappe_pawapay"
+
+[tool.bench.dev-dependencies]
+app_name = "frappe_pawapay"
+app_title = "PawaPay Payments"
+app_publisher = "Selfmade Cloud Solutions"
+app_description = "PawaPay Payments gateway for Frappe and ERPNext."
+app_email = "dev@selfmadecs.com"
+app_license = "mit"
+required_apps = ["frappe", "erpnext", "payments"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "tab"
