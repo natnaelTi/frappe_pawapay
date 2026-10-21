@@ -1,0 +1,28 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-08-13 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["settings", "company", "snapshot_at", "payload"],
+ "fields": [
+  {"fieldname": "settings", "fieldtype": "Link", "label": "PawaPay Settings", "options": "PawaPay Settings", "reqd": 1},
+  {"fieldname": "company", "fieldtype": "Link", "label": "Company", "options": "Company"},
+  {"fieldname": "snapshot_at", "fieldtype": "Datetime", "in_list_view": 1, "label": "Snapshot At"},
+  {"fieldname": "payload", "fieldtype": "Long Text", "label": "Payload"}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-13 00:00:00",
+ "modified_by": "Administrator",
+ "module": "PawaPay Payments",
+ "name": "PawaPay Wallet Snapshot",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1},
+  {"email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "Accounts Manager", "share": 1}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

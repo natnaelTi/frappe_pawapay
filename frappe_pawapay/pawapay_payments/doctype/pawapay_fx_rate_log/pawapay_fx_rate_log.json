@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "autoname": "PFX-.YYYY.-.######",
+ "creation": "2026-08-22 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "settings", "provider", "status", "from_currency", "to_currency", "rate",
+  "rate_date", "fetched_at", "source_url", "source_description",
+  "currency_exchange", "reference_doctype", "reference_name", "payment_request",
+  "error"
+ ],
+ "fields": [
+  {"fieldname": "settings", "fieldtype": "Link", "in_list_view": 1, "label": "PawaPay Settings", "options": "PawaPay Settings"},
+  {"fieldname": "provider", "fieldtype": "Data", "in_list_view": 1, "label": "Provider"},
+  {"fieldname": "status", "fieldtype": "Select", "in_list_view": 1, "label": "Status", "options": "Success\nFailed"},
+  {"fieldname": "from_currency", "fieldtype": "Link", "in_list_view": 1, "label": "From Currency", "options": "Currency"},
+  {"fieldname": "to_currency", "fieldtype": "Link", "in_list_view": 1, "label": "To Currency", "options": "Currency"},
+  {"fieldname": "rate", "fieldtype": "Float", "in_list_view": 1, "label": "Rate", "precision": "9"},
+  {"fieldname": "rate_date", "fieldtype": "Date", "in_list_view": 1, "label": "Rate Date"},
+  {"fieldname": "fetched_at", "fieldtype": "Datetime", "label": "Fetched At"},
+  {"fieldname": "source_url", "fieldtype": "Data", "label": "Source URL", "length": 512},
+  {"fieldname": "source_description", "fieldtype": "Small Text", "label": "Source Description"},
+  {"fieldname": "currency_exchange", "fieldtype": "Link", "label": "Currency Exchange", "options": "Currency Exchange"},
+  {"fieldname": "reference_doctype", "fieldtype": "Link", "label": "Reference DocType", "options": "DocType"},
+  {"fieldname": "reference_name", "fieldtype": "Dynamic Link", "label": "Reference Name", "options": "reference_doctype"},
+  {"fieldname": "payment_request", "fieldtype": "Link", "label": "Payment Request", "options": "Payment Request"},
+  {"fieldname": "error", "fieldtype": "Small Text", "label": "Error"}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-22 00:00:00",
+ "modified_by": "Administrator",
+ "module": "PawaPay Payments",
+ "name": "PawaPay FX Rate Log",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1},
+  {"email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "Accounts Manager", "share": 1}
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
