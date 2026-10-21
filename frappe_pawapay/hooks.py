@@ -7,6 +7,7 @@ app_license = "mit"
 required_apps = ["erpnext", "payments"]
 
 web_include_css = "/assets/frappe_pawapay/css/frappe_pawapay.css"
+app_include_js = "/assets/frappe_pawapay/js/pawapay_onboarding.js"
 
 doctype_js = {
 	"PawaPay Settings": "public/js/pawapay_settings.js",

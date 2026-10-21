@@ -1,8 +1,10 @@
 import frappe
+from frappe_pawapay.pawapay.bootstrap import bootstrap_default_configuration
 
 
 def after_install():
 	ensure_workspace()
+	bootstrap_default_configuration()
 
 
 def ensure_workspace():
