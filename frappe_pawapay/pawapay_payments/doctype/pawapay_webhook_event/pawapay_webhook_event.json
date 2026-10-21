@@ -1,0 +1,40 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-08-13 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["fingerprint", "operation_type", "external_id", "received_at", "settings", "environment", "signature_status", "key_id", "raw_body_hash", "redacted_payload", "processing_status", "attempts", "last_error", "next_retry", "transaction"],
+ "fields": [
+  {"fieldname": "fingerprint", "fieldtype": "Data", "in_list_view": 1, "label": "Fingerprint", "reqd": 1, "unique": 1},
+  {"fieldname": "operation_type", "fieldtype": "Select", "in_list_view": 1, "label": "Operation Type", "options": "Checkout\nDeposit\nPayout\nRefund\nUnknown"},
+  {"fieldname": "external_id", "fieldtype": "Data", "in_list_view": 1, "label": "External ID"},
+  {"fieldname": "received_at", "fieldtype": "Datetime", "label": "Received At"},
+  {"fieldname": "settings", "fieldtype": "Link", "label": "PawaPay Settings", "options": "PawaPay Settings"},
+  {"fieldname": "environment", "fieldtype": "Select", "label": "Environment", "options": "Sandbox\nProduction"},
+  {"fieldname": "signature_status", "fieldtype": "Select", "in_list_view": 1, "label": "Signature Status", "options": "Verified\nUnsigned\nInvalid\nNot Required"},
+  {"fieldname": "key_id", "fieldtype": "Data", "label": "Key ID"},
+  {"fieldname": "raw_body_hash", "fieldtype": "Data", "label": "Raw Body Hash"},
+  {"fieldname": "redacted_payload", "fieldtype": "Long Text", "label": "Redacted Payload"},
+  {"default": "Received", "fieldname": "processing_status", "fieldtype": "Select", "in_list_view": 1, "label": "Processing Status", "options": "Received\nQueued\nProcessed\nDuplicate\nFailed\nOrphaned"},
+  {"default": "0", "fieldname": "attempts", "fieldtype": "Int", "label": "Attempts"},
+  {"fieldname": "last_error", "fieldtype": "Small Text", "label": "Last Error"},
+  {"fieldname": "next_retry", "fieldtype": "Datetime", "label": "Next Retry"},
+  {"fieldname": "transaction", "fieldtype": "Link", "label": "PawaPay Transaction", "options": "PawaPay Transaction"}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-13 00:00:00",
+ "modified_by": "Administrator",
+ "module": "PawaPay Payments",
+ "name": "PawaPay Webhook Event",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1},
+  {"email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "Accounts Manager", "share": 1}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

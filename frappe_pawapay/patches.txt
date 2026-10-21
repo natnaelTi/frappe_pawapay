@@ -1,0 +1,5 @@
+[pre_model_sync]
+
+[post_model_sync]
+frappe_pawapay.patches.v0_0_1.migrate_collection_account_countries
+frappe_pawapay.patches.v0_0_1.add_payment_entry_idempotency_fields

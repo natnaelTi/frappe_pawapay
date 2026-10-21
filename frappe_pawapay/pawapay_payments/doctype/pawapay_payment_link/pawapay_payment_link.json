@@ -1,0 +1,38 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-08-13 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": ["token_hash", "public_token", "settings", "payment_request", "reference_doctype", "reference_name", "company", "expected_amount", "currency", "status", "business_expiry", "last_checkout_transaction", "attempt_count"],
+ "fields": [
+  {"fieldname": "token_hash", "fieldtype": "Data", "label": "Token Hash", "reqd": 1, "unique": 1},
+  {"fieldname": "public_token", "fieldtype": "Password", "hidden": 1, "label": "Public Token"},
+  {"fieldname": "settings", "fieldtype": "Link", "in_list_view": 1, "label": "PawaPay Settings", "options": "PawaPay Settings", "reqd": 1},
+  {"fieldname": "payment_request", "fieldtype": "Link", "in_list_view": 1, "label": "Payment Request", "options": "Payment Request", "reqd": 1},
+  {"fieldname": "reference_doctype", "fieldtype": "Link", "label": "Reference DocType", "options": "DocType"},
+  {"fieldname": "reference_name", "fieldtype": "Dynamic Link", "in_list_view": 1, "label": "Reference Name", "options": "reference_doctype"},
+  {"fieldname": "company", "fieldtype": "Link", "label": "Company", "options": "Company"},
+  {"fieldname": "expected_amount", "fieldtype": "Currency", "in_list_view": 1, "label": "Expected Amount", "options": "currency"},
+  {"fieldname": "currency", "fieldtype": "Link", "label": "Currency", "options": "Currency"},
+  {"default": "Active", "fieldname": "status", "fieldtype": "Select", "in_list_view": 1, "label": "Status", "options": "Active\nPaid\nExpired\nCancelled", "reqd": 1},
+  {"fieldname": "business_expiry", "fieldtype": "Datetime", "label": "Business Expiry"},
+  {"fieldname": "last_checkout_transaction", "fieldtype": "Link", "label": "Last Checkout Transaction", "options": "PawaPay Transaction"},
+  {"default": "0", "fieldname": "attempt_count", "fieldtype": "Int", "label": "Attempt Count"}
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-13 00:00:00",
+ "modified_by": "Administrator",
+ "module": "PawaPay Payments",
+ "name": "PawaPay Payment Link",
+ "owner": "Administrator",
+ "permissions": [
+  {"create": 1, "email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "System Manager", "share": 1, "write": 1},
+  {"email": 1, "export": 1, "print": 1, "read": 1, "report": 1, "role": "Accounts Manager", "share": 1}
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
