@@ -1,0 +1,121 @@
+{% extends "templates/web.html" %}
+
+{% set branded_checkout = is_branded_checkout or is_ams_checkout %}
+{% set payment_status = transaction.lifecycle_status if transaction else "PENDING" %}
+{% set completed = payment_status == "COMPLETED" %}
+{% set failed = payment_status in ("FAILED", "REJECTED", "CANCELLED") %}
+
+{% block title %}{{ checkout_page_title or _("Payment Status") }}{% endblock %}
+
+{% block favicon %}
+	{% if checkout_favicon %}
+	<link rel="icon" href="{{ checkout_favicon }}">
+	{% else %}
+	{{ super() }}
+	{% endif %}
+{% endblock %}
+
+{% block head_include %}
+	{{ super() }}
+	{% if checkout_stylesheet %}<link rel="stylesheet" href="{{ checkout_stylesheet }}">{% endif %}
+{% endblock %}
+
+{% block banner %}{% if not checkout_standalone %}{{ super() }}{% endif %}{% endblock %}
+{% block navbar %}{% if not checkout_standalone %}{{ super() }}{% endif %}{% endblock %}
+{% block footer %}{% if not checkout_standalone %}{{ super() }}{% endif %}{% endblock %}
+
+{% block content %}
+<main class="pawapay-page pawapay-status-page{% if branded_checkout %} pawapay-page--branded {{ checkout_theme_class }}{% endif %}">
+	<div class="pawapay-shell">
+		{% if branded_checkout %}
+		<header class="pawapay-host-header">
+			<a href="{{ checkout_home_url or '/' }}" class="pawapay-host-brand" aria-label="{{ checkout_brand or _('Merchant') }} {{ _('Home') }}">
+				{% if checkout_logo %}
+				<img src="{{ checkout_logo }}" alt="">
+				{% else %}
+				<span class="pawapay-host-mark" aria-hidden="true"><span></span></span>
+				{% endif %}
+				<span class="pawapay-host-brand-copy">
+					<strong>{{ checkout_brand or _("Secure Payment") }}</strong>
+					{% if checkout_brand_descriptor %}<small>{{ checkout_brand_descriptor }}</small>{% endif %}
+				</span>
+			</a>
+			<span class="pawapay-host-header-label">{{ checkout_header_label or _("Secure Checkout") }}</span>
+		</header>
+		{% endif %}
+
+		<div class="pawapay-layout">
+			{% if branded_checkout %}
+			<section class="pawapay-introduction pawapay-status-introduction" aria-labelledby="pawapay-status-title">
+				<div class="pawapay-introduction-copy">
+					<p class="pawapay-kicker">{{ checkout_status_eyebrow or _("Payment Update") }}</p>
+					<h1 id="pawapay-status-title">{{ checkout_status_title or _("Your Payment Status") }}</h1>
+					<p class="pawapay-intro">
+						{{ checkout_status_description or _("Confirmation can take a moment after mobile-money authorization. You can safely return to the application while processing continues.") }}
+					</p>
+				</div>
+				{% if checkout_image %}
+				<figure class="pawapay-artwork">
+					<img src="{{ checkout_image }}" alt="{{ checkout_image_alt }}">
+					{% if checkout_image_caption %}<figcaption>{{ checkout_image_caption }}</figcaption>{% endif %}
+				</figure>
+				{% endif %}
+			</section>
+			{% endif %}
+
+			<section class="pawapay-panel pawapay-status-panel" aria-labelledby="pawapay-status-panel-title">
+				<p class="pawapay-kicker">{{ checkout_header_label if branded_checkout and checkout_header_label else "PawaPay Payments" }}</p>
+				{% if branded_checkout %}
+				<h2 id="pawapay-status-panel-title">{{ _("Payment Status") }}</h2>
+				{% else %}
+				<h1 id="pawapay-status-panel-title">{{ _("Payment Status") }}</h1>
+				{% endif %}
+
+				<div class="pawapay-status-indicator{% if completed %} is-complete{% elif failed %} is-failed{% else %} is-pending{% endif %}" role="status">
+					<span aria-hidden="true"></span>
+					<div>
+						<small>{{ _("Current Status") }}</small>
+						<strong>{{ payment_status | replace("_", " ") | title }}</strong>
+					</div>
+				</div>
+
+				{% if transaction %}
+				<dl class="pawapay-summary">
+					<div><dt>{{ _("Accounting Status") }}</dt><dd>{{ transaction.accounting_status | replace("_", " ") | title }}</dd></div>
+					{% if transaction.client_reference_id %}<div><dt>{{ _("Reference") }}</dt><dd>{{ transaction.client_reference_id }}</dd></div>{% endif %}
+				</dl>
+				{% else %}
+				<p class="pawapay-message">{{ _("We are checking the payment status. Confirmation may arrive after this page opens.") }}</p>
+				{% endif %}
+
+				<a class="pawapay-button pawapay-button--link" href="{{ checkout_return_url or checkout_home_url or '/' }}">
+					{{ checkout_return_label or _("Return To Application") }}
+				</a>
+				<p class="pawapay-provider-note">
+					{% if checkout_provider_name %}
+						<span>{{ checkout_provider_prefix or _("Payment processing is provided by") }}&nbsp;</span>
+						{% if checkout_provider_logo %}
+							{% if checkout_provider_url %}<a href="{{ checkout_provider_url }}" rel="noopener noreferrer" target="_blank">{% endif %}
+							<img class="pawapay-provider-logo" src="{{ checkout_provider_logo }}" alt="{{ checkout_provider_name }}">
+							{% if checkout_provider_url %}</a>{% endif %}
+						{% else %}
+							{% if checkout_provider_url %}<a href="{{ checkout_provider_url }}" rel="noopener noreferrer" target="_blank">{% endif %}
+							<strong class="pawapay-provider-name">{{ checkout_provider_name }}</strong>
+							{% if checkout_provider_url %}</a>{% endif %}
+						{% endif %}
+					{% else %}
+						{{ checkout_provider_note or _("Payment processing is provided by PawaPay.") }}
+					{% endif %}
+				</p>
+			</section>
+		</div>
+
+		{% if branded_checkout %}
+		<footer class="pawapay-host-footer">
+			<span>{% if checkout_footer_text %}&copy; {{ checkout_footer_text }}{% else %}{{ checkout_brand or _("Merchant Checkout") }}{% endif %}</span>
+			<a href="{{ checkout_return_url or checkout_home_url or '/' }}">{{ checkout_return_label or _("Return To Application") }}</a>
+		</footer>
+		{% endif %}
+	</div>
+</main>
+{% endblock %}

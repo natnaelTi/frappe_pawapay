@@ -1,0 +1,357 @@
+{% extends "templates/web.html" %}
+
+{% set branded_checkout = is_branded_checkout or is_ams_checkout %}
+
+{% block title %}{{ checkout_page_title or _("Mobile Money Payment") }}{% endblock %}
+
+{% block favicon %}
+	{% if checkout_favicon %}
+	<link rel="icon" href="{{ checkout_favicon }}">
+	{% else %}
+	{{ super() }}
+	{% endif %}
+{% endblock %}
+
+{% block head_include %}
+	{{ super() }}
+	{% if checkout_stylesheet %}<link rel="stylesheet" href="{{ checkout_stylesheet }}">{% endif %}
+{% endblock %}
+
+{% block banner %}{% if not checkout_standalone %}{{ super() }}{% endif %}{% endblock %}
+{% block navbar %}{% if not checkout_standalone %}{{ super() }}{% endif %}{% endblock %}
+{% block footer %}{% if not checkout_standalone %}{{ super() }}{% endif %}{% endblock %}
+
+{% block content %}
+<main class="pawapay-page{% if branded_checkout %} pawapay-page--branded {{ checkout_theme_class }}{% endif %}" id="pawapay-checkout">
+	<div class="pawapay-shell">
+		{% if branded_checkout %}
+		<header class="pawapay-host-header">
+			<a href="{{ checkout_home_url or '/' }}" class="pawapay-host-brand" aria-label="{{ checkout_brand or _('Merchant') }} {{ _('Home') }}">
+				{% if checkout_logo %}
+				<img src="{{ checkout_logo }}" alt="">
+				{% else %}
+				<span class="pawapay-host-mark" aria-hidden="true"><span></span></span>
+				{% endif %}
+				<span class="pawapay-host-brand-copy">
+					<strong>{{ checkout_brand or _("Secure Payment") }}</strong>
+					{% if checkout_brand_descriptor %}<small>{{ checkout_brand_descriptor }}</small>{% endif %}
+				</span>
+			</a>
+			<span class="pawapay-host-header-label">{{ checkout_header_label or _("Secure Checkout") }}</span>
+		</header>
+		{% endif %}
+
+		{% if checkout_notice %}
+		<div class="pawapay-notice" role="status"><span aria-hidden="true"></span>{{ checkout_notice }}</div>
+		{% endif %}
+
+		<div class="pawapay-layout">
+			{% if branded_checkout %}
+			<section class="pawapay-introduction" aria-labelledby="pawapay-page-title">
+				<div class="pawapay-introduction-copy">
+					<p class="pawapay-kicker">{{ checkout_eyebrow or _("Mobile Money") }}</p>
+					<h1 id="pawapay-page-title">{{ checkout_title or _("Complete Your Payment") }}</h1>
+					{% if checkout_description %}<p class="pawapay-intro">{{ checkout_description }}</p>{% endif %}
+				</div>
+
+				{% if checkout_image %}
+				<figure class="pawapay-artwork">
+					<img src="{{ checkout_image }}" alt="{{ checkout_image_alt }}">
+					{% if checkout_image_caption %}<figcaption>{{ checkout_image_caption }}</figcaption>{% endif %}
+				</figure>
+				{% endif %}
+
+				{% if checkout_assurances %}
+				<ul class="pawapay-assurances" aria-label="{{ _('Checkout assurances') }}">
+					{% for assurance in checkout_assurances %}<li>{{ assurance }}</li>{% endfor %}
+				</ul>
+				{% endif %}
+			</section>
+			{% endif %}
+
+			<section class="pawapay-panel" aria-labelledby="pawapay-panel-title">
+				<div id="pawapay-pricing-loader" class="pawapay-pricing-loader" role="status" aria-live="polite" hidden>
+					<span class="pawapay-pricing-spinner" aria-hidden="true"></span>
+					<span class="pawapay-visually-hidden">{{ _("Updating payment amount") }}</span>
+				</div>
+				<header class="pawapay-panel-header">
+					<p class="pawapay-kicker">{{ checkout_header_label if branded_checkout and checkout_header_label else "PawaPay Payments" }}</p>
+					{% if branded_checkout %}
+					<h2 id="pawapay-panel-title">{{ _("Payment Summary") }}</h2>
+					{% else %}
+					<h1 id="pawapay-panel-title">{{ _("Mobile Money Payment") }}</h1>
+					{% endif %}
+				</header>
+
+				<dl class="pawapay-summary pawapay-receipt">
+					{% for detail in checkout_details %}
+					<div><dt>{{ detail.label }}</dt><dd>{{ detail.value }}</dd></div>
+					{% endfor %}
+					{% if checkout_show_merchant %}
+					<div><dt>{{ checkout_merchant_label or _("Merchant") }}</dt><dd>{{ merchant }}</dd></div>
+					{% endif %}
+					{% if checkout_show_reference %}
+					<div id="pawapay-summary-reference"><dt>{{ checkout_reference_label or _("Reference") }}</dt><dd>{{ reference }}</dd></div>
+					{% endif %}
+					<div class="pawapay-summary-price">
+						<dt>{{ checkout_amount_label or _("Amount") }}</dt>
+						<dd><span class="pawapay-currency-code">{{ currency }}</span> {{ amount }}</dd>
+					</div>
+					{% if converted_payment %}
+					{% if exchange_rate_used %}
+					<div class="pawapay-summary-rate">
+						<dt>{{ _("Exchange Rate") }}</dt>
+						<dd>
+							<strong>{{ exchange_rate_used }}</strong>
+							{% if fx_source %}
+								{% if fx_source_url %}
+								<a class="pawapay-rate-source" href="{{ fx_source_url }}" rel="noopener noreferrer" target="_blank">
+									{{ _("Source") }}: {{ fx_source }}{% if fx_rate_date %} · {{ fx_rate_date }}{% endif %}
+								</a>
+								{% elif checkout_show_reference %}
+								<a class="pawapay-rate-source" href="#pawapay-summary-reference">
+									{{ _("Source") }}: {{ fx_source }}{% if fx_rate_date %} · {{ fx_rate_date }}{% endif %}
+								</a>
+								{% else %}
+								<span class="pawapay-rate-source">{{ _("Source") }}: {{ fx_source }}{% if fx_rate_date %} · {{ fx_rate_date }}{% endif %}</span>
+								{% endif %}
+							{% endif %}
+						</dd>
+					</div>
+					{% endif %}
+					<div class="pawapay-summary-local">
+						<dt>{{ checkout_local_amount_label or _("Payable Locally") }}</dt>
+						<dd><span class="pawapay-currency-code">{{ collection_currency }}</span> {{ collection_amount }}</dd>
+					</div>
+					{% endif %}
+				</dl>
+
+				{% if error_message %}
+				<p class="pawapay-message pawapay-error" role="alert">{{ error_message }}</p>
+				{% elif checkout_error %}
+				<p class="pawapay-message pawapay-error" role="alert">{{ checkout_error }}</p>
+				{% endif %}
+
+				{% if is_link_payable %}
+				<form id="pawapay-checkout-form" action="/api/method/frappe_pawapay.api.start_checkout" method="post">
+					<input id="pawapay-csrf-token" type="hidden" name="csrf_token" value="{{ csrf_token or '' }}">
+					<input type="hidden" name="token" value="{{ token }}">
+					<div class="pawapay-fields">
+						<div class="pawapay-select-field">
+							<label for="pawapay-country">{{ _("Country") }}</label>
+							<select id="pawapay-country" name="country" autocomplete="country">
+								{% for option in country_options %}
+								<option value="{{ option.country }}" {% if option.country == collection_country %}selected{% endif %}>{{ option.country_name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+
+						<div class="pawapay-select-field">
+							<label for="pawapay-currency">{{ _("Currency") }}</label>
+							<select id="pawapay-currency" name="currency"></select>
+						</div>
+					</div>
+					<button
+						class="pawapay-button"
+						type="submit"
+						data-processing-label="{{ checkout_processing_label or _('Opening Secure Checkout') }}"
+						{% if not can_pay %}disabled{% endif %}
+					>
+						{{ checkout_submit_label or _("Pay With Mobile Money") }}
+					</button>
+					<p id="pawapay-session-error" class="pawapay-message pawapay-error" role="alert" hidden>
+						{{ _("Your payment session could not be verified. Reload this page and try again.") }}
+					</p>
+				</form>
+				{% else %}
+				<p class="pawapay-message">{{ _("This payment link is no longer payable.") }}</p>
+				{% endif %}
+
+				<p class="pawapay-provider-note">
+					{% if checkout_provider_name %}
+						<span>{{ checkout_provider_prefix or _("Payment processing is provided by") }}&nbsp;</span>
+						{% if checkout_provider_logo %}
+							{% if checkout_provider_url %}<a href="{{ checkout_provider_url }}" rel="noopener noreferrer" target="_blank">{% endif %}
+							<img class="pawapay-provider-logo" src="{{ checkout_provider_logo }}" alt="{{ checkout_provider_name }}">
+							{% if checkout_provider_url %}</a>{% endif %}
+						{% else %}
+							{% if checkout_provider_url %}<a href="{{ checkout_provider_url }}" rel="noopener noreferrer" target="_blank">{% endif %}
+							<strong class="pawapay-provider-name">{{ checkout_provider_name }}</strong>
+							{% if checkout_provider_url %}</a>{% endif %}
+						{% endif %}
+					{% else %}
+						{{ checkout_provider_note or _("Payment processing is provided by PawaPay.") }}
+					{% endif %}
+				</p>
+			</section>
+		</div>
+
+		{% if branded_checkout %}
+		<footer class="pawapay-host-footer">
+			<span>{% if checkout_footer_text %}&copy; {{ checkout_footer_text }}{% else %}{{ checkout_brand or _("Merchant Checkout") }}{% endif %}</span>
+			<a href="{{ checkout_return_url or checkout_home_url or '/' }}">{{ checkout_return_label or _("Return To Pricing") }}</a>
+		</footer>
+		{% endif %}
+	</div>
+</main>
+
+<script
+	type="application/json"
+	id="pawapay-country-options"
+	data-selected-currency="{{ collection_currency or '' }}"
+>{{ country_options_json | safe }}</script>
+<script>
+(function () {
+	const checkoutForm = document.getElementById("pawapay-checkout-form");
+	const csrfInput = document.getElementById("pawapay-csrf-token");
+	const sessionError = document.getElementById("pawapay-session-error");
+	const countrySelect = document.getElementById("pawapay-country");
+	const currencySelect = document.getElementById("pawapay-currency");
+	const dataElement = document.getElementById("pawapay-country-options");
+	const checkoutPanel = checkoutForm ? checkoutForm.closest(".pawapay-panel") : null;
+	const pricingLoader = document.getElementById("pawapay-pricing-loader");
+	let selectionReloadPending = false;
+
+	function isUsableCsrfToken(token) {
+		return Boolean(token && token !== "None" && token !== "null" && token !== "undefined");
+	}
+
+	async function fetchSessionCsrfToken() {
+		const response = await fetch("/api/method/frappe_pawapay.api.get_checkout_csrf_token", {
+			method: "GET",
+			credentials: "same-origin",
+			headers: { Accept: "application/json" }
+		});
+		if (!response.ok) return "";
+		const payload = await response.json();
+		return payload && payload.message && payload.message.csrf_token;
+	}
+
+	if (checkoutForm && csrfInput) {
+		checkoutForm.addEventListener("submit", async function (event) {
+			const submitButton = checkoutForm.querySelector('button[type="submit"]');
+			const defaultLabel = submitButton ? submitButton.textContent.trim() : "";
+			if (submitButton && submitButton.disabled) {
+				event.preventDefault();
+				return;
+			}
+			if (submitButton) {
+				submitButton.disabled = true;
+				submitButton.textContent = submitButton.dataset.processingLabel;
+			}
+			const injectedToken = window.frappe && window.frappe.csrf_token;
+			const currentToken = isUsableCsrfToken(injectedToken) ? injectedToken : csrfInput.value;
+			if (isUsableCsrfToken(currentToken)) {
+				csrfInput.value = currentToken;
+				return;
+			}
+
+			event.preventDefault();
+			try {
+				const refreshedToken = await fetchSessionCsrfToken();
+				if (!isUsableCsrfToken(refreshedToken)) throw new Error("Missing CSRF token");
+				csrfInput.value = refreshedToken;
+				checkoutForm.submit();
+			} catch (error) {
+				if (sessionError) sessionError.hidden = false;
+				if (submitButton) {
+					submitButton.disabled = false;
+					submitButton.textContent = defaultLabel;
+				}
+			}
+		});
+	}
+
+	if (!countrySelect || !currencySelect || !dataElement) return;
+
+	let options = [];
+	try {
+		options = JSON.parse(dataElement.textContent || "[]");
+	} catch (error) {
+		options = [];
+	}
+	const selectedCurrency = dataElement.dataset.selectedCurrency || "";
+	const iso2ToPawaPay = {
+		BJ: "BEN", CM: "CMR", CD: "COD", CG: "COG", GA: "GAB", CI: "CIV",
+		KE: "KEN", RW: "RWA", SN: "SEN", SL: "SLE", UG: "UGA", ZM: "ZMB"
+	};
+
+	function findCountry(code) {
+		return options.find((option) => option.country === code);
+	}
+
+	function fillCurrencies(preferredCurrency) {
+		const country = findCountry(countrySelect.value);
+		currencySelect.innerHTML = "";
+		(country ? country.currencies : []).forEach((currency) => {
+			const option = document.createElement("option");
+			option.value = currency.currency;
+			option.textContent = currency.display_name === currency.currency
+				? currency.currency
+				: `${currency.currency} (${currency.display_name})`;
+			if (currency.currency === preferredCurrency) option.selected = true;
+			currencySelect.appendChild(option);
+		});
+	}
+
+	function setSelectionLoading() {
+		if (selectionReloadPending) return false;
+		selectionReloadPending = true;
+		if (checkoutForm) checkoutForm.setAttribute("aria-busy", "true");
+		if (checkoutPanel) checkoutPanel.setAttribute("aria-busy", "true");
+		if (pricingLoader) pricingLoader.hidden = false;
+		Array.from(checkoutForm ? checkoutForm.elements : []).forEach((control) => {
+			if (!control.disabled) {
+				control.dataset.pawapayDisabledForRefresh = "true";
+				control.disabled = true;
+			}
+		});
+		return true;
+	}
+
+	function resetSelectionLoading() {
+		selectionReloadPending = false;
+		if (checkoutForm) checkoutForm.removeAttribute("aria-busy");
+		if (checkoutPanel) checkoutPanel.removeAttribute("aria-busy");
+		if (pricingLoader) pricingLoader.hidden = true;
+		Array.from(checkoutForm ? checkoutForm.elements : []).forEach((control) => {
+			if (control.dataset.pawapayDisabledForRefresh === "true") {
+				control.disabled = false;
+				delete control.dataset.pawapayDisabledForRefresh;
+			}
+		});
+	}
+
+	function reloadForSelection() {
+		if (selectionReloadPending) return;
+		const url = new URL(window.location.href);
+		url.searchParams.set("country", countrySelect.value);
+		url.searchParams.set("currency", currencySelect.value);
+		if (!setSelectionLoading()) return;
+		window.requestAnimationFrame(() => window.location.assign(url.toString()));
+	}
+
+	function detectBrowserCountry() {
+		const currentUrl = new URL(window.location.href);
+		if (currentUrl.searchParams.has("country")) return;
+		const locale = navigator.language || (navigator.languages || [])[0] || "";
+		const region = locale.split("-").pop().toUpperCase();
+		const detected = iso2ToPawaPay[region];
+		if (detected && findCountry(detected) && countrySelect.value !== detected) {
+			countrySelect.value = detected;
+			fillCurrencies();
+			reloadForSelection();
+		}
+	}
+
+	fillCurrencies(selectedCurrency);
+	countrySelect.addEventListener("change", function () {
+		fillCurrencies();
+		reloadForSelection();
+	});
+	currencySelect.addEventListener("change", reloadForSelection);
+	window.addEventListener("pageshow", resetSelectionLoading);
+	detectBrowserCountry();
+})();
+</script>
+{% endblock %}
